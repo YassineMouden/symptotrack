@@ -60,9 +60,14 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
+    age           Int?
+    sex           String?
+    
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
+    trackingSessions TrackingSession[]
+    userSymptoms  UserSymptom[]
+    userConditions UserCondition[]
 }
 
 model VerificationToken {
@@ -71,4 +76,114 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+// SymptoTrack Models
+
+model TrackingSession {
+    id          String   @id @default(cuid())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    currentStep String   @default("info") // info, symptoms, conditions, details, treatment
+    completed   Boolean  @default(false)
+    
+    userId      String
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    userSymptoms    UserSymptom[]
+    userConditions  UserCondition[]
+}
+
+model BodyPart {
+    id          String   @id @default(cuid())
+    name        String   @unique
+    svgId       String   @unique // ID in the SVG for the body part
+    description String?
+    
+    symptoms    Symptom[]
+}
+
+model Symptom {
+    id          String   @id @default(cuid())
+    name        String   @unique
+    description String?
+    severity    String[] // mild, moderate, severe
+    
+    bodyPartId  String
+    bodyPart    BodyPart @relation(fields: [bodyPartId], references: [id])
+    
+    userSymptoms UserSymptom[]
+    conditions   SymptomCondition[]
+    
+    @@index([bodyPartId])
+}
+
+model UserSymptom {
+    id          String   @id @default(cuid())
+    createdAt   DateTime @default(now())
+    severity    String // mild, moderate, severe
+    duration    String? // how long the symptom has been present
+    notes       String?
+    
+    userId      String
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    symptomId   String
+    symptom     Symptom  @relation(fields: [symptomId], references: [id])
+    
+    sessionId   String
+    session     TrackingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+    
+    @@unique([userId, symptomId, sessionId])
+    @@index([userId])
+    @@index([symptomId])
+    @@index([sessionId])
+}
+
+model Condition {
+    id          String   @id @default(cuid())
+    name        String   @unique
+    description String
+    treatmentInfo String?
+    isSevere    Boolean  @default(false)
+    
+    symptoms    SymptomCondition[]
+    userConditions UserCondition[]
+}
+
+model SymptomCondition {
+    id          String   @id @default(cuid())
+    relevance   Float    // 0.0 to 1.0, how relevant this symptom is for this condition
+    
+    symptomId   String
+    symptom     Symptom  @relation(fields: [symptomId], references: [id])
+    
+    conditionId String
+    condition   Condition @relation(fields: [conditionId], references: [id])
+    
+    @@unique([symptomId, conditionId])
+    @@index([symptomId])
+    @@index([conditionId])
+}
+
+model UserCondition {
+    id          String   @id @default(cuid())
+    createdAt   DateTime @default(now())
+    confidenceScore Float // AI-generated confidence (0.0 to 1.0)
+    userConfirmed Boolean? // User feedback if this was accurate
+    notes       String?
+    
+    userId      String
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    conditionId String
+    condition   Condition @relation(fields: [conditionId], references: [id])
+    
+    sessionId   String
+    session     TrackingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+    
+    @@unique([userId, conditionId, sessionId])
+    @@index([userId])
+    @@index([conditionId])
+    @@index([sessionId])
 }

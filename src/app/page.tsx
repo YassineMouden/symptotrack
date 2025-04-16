@@ -1,69 +1,100 @@
-import Link from "next/link";
+"use client";
 
-import { LatestPost } from "~/app/_components/post";
-import { auth } from "~/server/auth";
-import { api, HydrateClient } from "~/trpc/server";
+import { useState } from "react";
+import ProgressBar, { type Step } from "./_components/ProgressBar";
+import StepNavigation from "./_components/StepNavigation";
 
-export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
-  const session = await auth();
+export default function Home() {
+  const [currentStep, setCurrentStep] = useState<Step>("info");
+  const steps: Step[] = ["info", "symptoms", "conditions", "details", "treatment"];
 
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
-  }
+  const handlePrevious = () => {
+    const currentIndex = steps.indexOf(currentStep);
+    if (currentIndex > 0) {
+      setCurrentStep(steps[currentIndex - 1]!);
+    }
+  };
+
+  const handleNext = () => {
+    const currentIndex = steps.indexOf(currentStep);
+    if (currentIndex < steps.length - 1) {
+      setCurrentStep(steps[currentIndex + 1]!);
+    }
+  };
+
+  const isFirstStep = currentStep === "info";
+  const isLastStep = currentStep === "treatment";
 
   return (
-    <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
-
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-                {session && <span>Logged in as {session.user?.name}</span>}
+    <div className="mx-auto max-w-4xl">
+      <h1 className="mb-6 text-center text-3xl font-bold text-gray-800 dark:text-white">
+        Welcome to SymptoTrack
+      </h1>
+      <p className="mb-8 text-center text-gray-600 dark:text-gray-300">
+        Track your symptoms and discover potential conditions with our interactive medical assistant.
+      </p>
+      
+      <div className="rounded-lg bg-white p-8 shadow-md dark:bg-gray-800">
+        <ProgressBar 
+          currentStep={currentStep}
+          onStepClick={setCurrentStep}
+        />
+        
+        <div className="min-h-[300px] py-6">
+          {currentStep === "info" && (
+            <div>
+              <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-white">Personal Information</h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                This is the information step. Here, users would enter their basic information.
               </p>
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
             </div>
-          </div>
-
-          {session?.user && <LatestPost />}
+          )}
+          
+          {currentStep === "symptoms" && (
+            <div>
+              <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-white">Select Your Symptoms</h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                This is the symptoms step. Here, users would select symptoms from the interactive body model.
+              </p>
+            </div>
+          )}
+          
+          {currentStep === "conditions" && (
+            <div>
+              <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-white">Potential Conditions</h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                This is the conditions step. Here, users would see AI-suggested conditions.
+              </p>
+            </div>
+          )}
+          
+          {currentStep === "details" && (
+            <div>
+              <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-white">Additional Details</h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                This is the details step. Here, users would be asked additional questions about their symptoms.
+              </p>
+            </div>
+          )}
+          
+          {currentStep === "treatment" && (
+            <div>
+              <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-white">Treatment Suggestions</h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                This is the treatment step. Here, users would receive treatment suggestions based on their conditions.
+              </p>
+            </div>
+          )}
         </div>
-      </main>
-    </HydrateClient>
+        
+        <StepNavigation
+          currentStep={currentStep}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          canGoPrevious={!isFirstStep}
+          isLastStep={isLastStep}
+        />
+      </div>
+    </div>
   );
 }
