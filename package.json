@@ -23,6 +23,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",
     "@prisma/client": "^6.5.0",
+    "@supabase/supabase-js": "^2.49.4",
     "@t3-oss/env-nextjs": "^0.12.0",
     "@tanstack/react-query": "^5.69.0",
     "@trpc/client": "^11.0.0",
@@ -41,7 +42,7 @@
     "react-hook-form": "^7.55.0",
     "react-modal": "^3.16.3",
     "reactjs-human-body": "^0.0.8",
-    "resend": "^2.7.0",
+    "resend": "^1.0.0",
     "server-only": "^0.0.1",
     "styled-components": "^6.1.17",
     "superjson": "^2.2.1",
