@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-    provider = "postgresql"
+    provider = "sqlite"
     // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
@@ -57,9 +57,10 @@ model Session {
 model User {
     id            String    @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?
     emailVerified DateTime?
     image         String?
+    password      String?
     age           Int?
     sex           String?
     
@@ -68,6 +69,11 @@ model User {
     trackingSessions TrackingSession[]
     userSymptoms  UserSymptom[]
     userConditions UserCondition[]
+    posts         Post[]
+    passwordResets PasswordReset[]
+
+    // Ensure email is unique only if it's present
+    @@unique([email], name: "email_unique_if_exists", map: "email_unique_if_exists")
 }
 
 model VerificationToken {
@@ -76,6 +82,22 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+// Password reset tokens
+model PasswordReset {
+    id        String   @id @default(cuid())
+    token     String   @unique
+    email     String
+    expires   DateTime
+    createdAt DateTime @default(now())
+    
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    @@index([email])
+    @@index([userId])
+    @@index([token])
 }
 
 // SymptoTrack Models
@@ -107,7 +129,7 @@ model Symptom {
     id          String   @id @default(cuid())
     name        String   @unique
     description String?
-    severity    String[] // mild, moderate, severe
+    severityOptions String  // Comma-separated: mild,moderate,severe
     
     bodyPartId  String
     bodyPart    BodyPart @relation(fields: [bodyPartId], references: [id])

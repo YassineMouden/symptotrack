@@ -2,7 +2,7 @@ import { type FC } from "react";
 import { type Step } from "./ProgressBar";
 
 interface StepNavigationProps {
-  currentStep: Step;
+  _currentStep: Step;
   onPrevious: () => void;
   onNext: () => void;
   canGoNext?: boolean;
@@ -11,7 +11,7 @@ interface StepNavigationProps {
 }
 
 const StepNavigation: FC<StepNavigationProps> = ({
-  currentStep,
+  _currentStep,
   onPrevious,
   onNext,
   canGoNext = true,
