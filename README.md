@@ -1,29 +1,144 @@
-# Create T3 App
+# SymptoTrack
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+![SymptoTrack Logo](public/images/readme-banner.png)
 
-## What's next? How do I make an app with this?
+## Overview
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+SymptoTrack is a comprehensive symptom tracking and analysis application that helps users identify potential medical conditions based on their symptoms. By leveraging artificial intelligence and an interactive body model, SymptoTrack provides a user-friendly interface to track health symptoms, receive potential condition matches, and access treatment recommendations.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+**Key Features:**
+- Interactive body model for intuitive symptom selection
+- AI-powered symptom analysis with confidence scoring
+- Detailed condition information with treatment recommendations
+- Medical resource finder to connect with healthcare providers
+- Save and share capabilities for treatment plans
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+> **Medical Disclaimer:** SymptoTrack is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
 
-## Learn More
+## Tech Stack
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+SymptoTrack is built with the modern [T3 Stack](https://create.t3.gg/):
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+- **Frontend**: [Next.js](https://nextjs.org), [TypeScript](https://www.typescriptlang.org), [Tailwind CSS](https://tailwindcss.com)
+- **Authentication**: [NextAuth.js](https://next-auth.js.org)
+- **Database**: [Prisma](https://prisma.io) with SQLite (configurable for PostgreSQL)
+- **AI Integration**: [OpenAI GPT-4](https://openai.com/gpt-4)
+- **Interactive UI**: [reactjs-human-body](https://www.npmjs.com/package/reactjs-human-body)
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+## Getting Started
 
-## How do I deploy this?
+### Prerequisites
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+- Node.js 18+ (LTS recommended)
+- npm or yarn
+- OpenAI API key for AI-powered features
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/symptotrack.git
+   cd symptotrack
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn
+   ```
+
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit the `.env` file and add your OpenAI API key and other required variables.
+
+4. Set up the database:
+   ```bash
+   npx prisma migrate dev
+   # or
+   yarn prisma migrate dev
+   ```
+
+5. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Application Structure
+
+SymptoTrack follows a 5-step process to guide users through symptom tracking and analysis:
+
+1. **Info**: Collection of basic user information (age, sex)
+2. **Symptoms**: Interactive selection of symptoms using a body model or search
+3. **Conditions**: AI-generated potential conditions based on reported symptoms
+4. **Details**: Additional targeted questions based on potential conditions
+5. **Treatment**: Treatment recommendations and next steps
+
+## Core Components
+
+### Interactive Body Model
+
+The application uses a visual body model allowing users to click on different body parts to select symptoms. This provides an intuitive way to specify symptom locations without medical terminology.
+
+### AI Symptom Analysis
+
+SymptoTrack uses OpenAI's GPT-4 to analyze reported symptoms and generate potential matching conditions with confidence scores. This analysis includes:
+
+- Condition descriptions and symptom matching
+- Potential severity assessment
+- Treatment approaches
+- When to see a doctor recommendations
+
+### Treatment Recommendations
+
+For each potential condition, the application provides:
+
+- Categorized treatment options (medications, lifestyle changes, procedures)
+- Medical resource finder to locate healthcare providers
+- Shareable treatment reports
+
+## Development
+
+### Project Structure
+
+```
+symptotrack/
+├── prisma/                # Database schema and migrations
+├── public/                # Static files
+├── src/
+│   ├── app/               # Next.js App Router pages and components
+│   │   ├── _components/   # Shared UI components
+│   │   ├── api/           # API routes
+│   │   ├── auth/          # Authentication pages
+│   │   ├── conditions/    # Conditions results page
+│   │   ├── details/       # Additional details page
+│   │   ├── symptoms/      # Symptoms input page
+│   │   ├── treatment/     # Treatment recommendations page
+│   │   └── page.tsx       # Home page (user info)
+│   ├── env.js             # Environment variable validation
+│   ├── server/            # Server-side code
+│   ├── types/             # TypeScript type definitions
+│   └── utils/             # Utility functions incl. AI integration
+└── ...
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- [Create T3 App](https://create.t3.gg/) for the project scaffolding
+- [OpenAI](https://openai.com) for the AI capabilities
+- [reactjs-human-body](https://www.npmjs.com/package/reactjs-human-body) for the interactive body model
