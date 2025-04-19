@@ -2,6 +2,7 @@
   "name": "symptotrack",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "next build",
     "check": "next lint && tsc --noEmit",
@@ -28,6 +29,7 @@
     "@trpc/react-query": "^11.0.0",
     "@trpc/server": "^11.0.0",
     "@types/bcryptjs": "^2.4.6",
+    "autoprefixer": "^10.4.21",
     "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
     "lru-cache": "^10.4.3",
@@ -39,6 +41,7 @@
     "react-hook-form": "^7.55.0",
     "react-modal": "^3.16.3",
     "reactjs-human-body": "^0.0.8",
+    "resend": "^4.3.0",
     "server-only": "^0.0.1",
     "styled-components": "^6.1.17",
     "superjson": "^2.2.1",
