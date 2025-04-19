@@ -1,6 +1,5 @@
 // scripts/migrate-db.js
-import { execSync } from 'child_process';
-import { env } from '../src/env.js';
+const { execSync } = require('child_process');
 
 // This script runs the Prisma migration in production
 async function main() {
@@ -9,10 +8,7 @@ async function main() {
     
     // Run Prisma migrations
     execSync('npx prisma migrate deploy', {
-      env: {
-        ...process.env,
-        DATABASE_URL: env.DATABASE_URL,
-      },
+      env: process.env,
       stdio: 'inherit',
     });
     
