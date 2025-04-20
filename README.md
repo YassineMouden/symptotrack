@@ -29,7 +29,7 @@ SymptoTrack is built with the modern [T3 Stack](https://create.t3.gg/):
 
 ### Prerequisites
 
-- Node.js 18+ (LTS recommended)
+- Node.js 
 - npm or yarn
 - OpenAI API key for AI-powered features
 
@@ -129,16 +129,5 @@ symptotrack/
 └── ...
 ```
 
-## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- [Create T3 App](https://create.t3.gg/) for the project scaffolding
-- [OpenAI](https://openai.com) for the AI capabilities
-- [reactjs-human-body](https://www.npmjs.com/package/reactjs-human-body) for the interactive body model
