@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -10,20 +10,32 @@ export default function SignInPage() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
   const error = searchParams.get("error");
+  const { status } = useSession();
   
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("test@example.com"); // Pre-filled for testing
+  const [password, setPassword] = useState("password"); // Pre-filled for testing
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(
     error === "CredentialsSignin" ? "Invalid email or password" : error
   );
+  const [signInAttempted, setSignInAttempted] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
+
+  // Redirect to callbackUrl if already authenticated
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push(callbackUrl);
+    }
+  }, [status, router, callbackUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage(null);
+    setSignInAttempted(true);
 
     try {
+      console.log("Attempting sign in with:", { email, password });
       const result = await signIn("credentials", {
         redirect: false,
         email,
@@ -31,13 +43,20 @@ export default function SignInPage() {
         callbackUrl,
       });
 
+      setDebugInfo(result);
+
       if (result?.error) {
         setErrorMessage(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error);
         setIsLoading(false);
       } else if (result?.url) {
         router.push(result.url);
+      } else {
+        setErrorMessage("Unknown error occurred. Please try again.");
+        setIsLoading(false);
       }
     } catch (error) {
+      console.error("Sign in error:", error);
+      setDebugInfo(error);
       setErrorMessage("An error occurred. Please try again.");
       setIsLoading(false);
     }
@@ -55,6 +74,12 @@ export default function SignInPage() {
       {errorMessage && (
         <div className="mb-4 rounded-md bg-red-50 p-4 text-red-800 dark:bg-red-900/30 dark:text-red-300">
           <p>{errorMessage}</p>
+        </div>
+      )}
+
+      {signInAttempted && status === "loading" && (
+        <div className="mb-4 rounded-md bg-blue-50 p-4 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+          <p>Authenticating...</p>
         </div>
       )}
 
@@ -172,6 +197,15 @@ export default function SignInPage() {
           Sign up
         </Link>
       </p>
+      
+      {process.env.NODE_ENV === "development" && debugInfo && (
+        <div className="mt-8 rounded-md bg-gray-50 p-4 dark:bg-gray-700">
+          <p className="text-xs font-medium text-gray-700 dark:text-gray-300">Debug Information:</p>
+          <pre className="mt-2 overflow-auto text-xs text-gray-600 dark:text-gray-400">
+            {JSON.stringify(debugInfo, null, 2)}
+          </pre>
+        </div>
+      )}
     </div>
   );
 } 

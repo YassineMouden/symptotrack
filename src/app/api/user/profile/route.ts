@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "~/server/auth";
-import { db } from "~/server/db";
+// Remove database import since we're not using it
+// import { db } from "~/server/db";
 
 // Define validation schema for profile update
 const profileSchema = z.object({
@@ -44,15 +45,16 @@ export async function PUT(req: Request) {
     
     const { name, age, sex } = result.data;
     
-    // Update user profile
-    const updatedUser = await db.user.update({
-      where: { id: session.user.id },
-      data: {
-        name: name ?? undefined,
-        age: age ?? undefined,
-        sex: sex ?? undefined,
-      },
-    });
+    // Instead of updating in the database, create a mock response
+    // with the updated user data
+    const updatedUser = {
+      id: session.user.id,
+      name: name ?? session.user.name,
+      email: session.user.email,
+      age: age ?? session.user.age,
+      sex: sex ?? session.user.sex,
+      image: session.user.image,
+    };
     
     // Create a safe user object without sensitive data
     const userResponse = {

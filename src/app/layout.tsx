@@ -27,7 +27,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={`${geist.variable}`}>
-      <body className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <body suppressHydrationWarning className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <StyledComponentsRegistry>
           <TRPCReactProvider>
             <Providers session={session}>
