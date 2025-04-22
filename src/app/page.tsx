@@ -63,7 +63,7 @@ export default function Home() {
     <div className="mx-auto max-w-4xl">
       <h1 className="mb-2 text-center text-3xl font-bold text-gray-800 dark:text-white">
         SymptoTrack
-      </h1>
+          </h1>
       <p className="mb-8 text-center text-xl text-teal-600 dark:text-teal-400">
         Track your symptoms, understand your health
       </p>
@@ -243,7 +243,7 @@ export default function Home() {
                   This screen will be developed further to show AI-generated potential conditions.
                 </p>
               </div>
-            </div>
+          </div>
           )}
           
           {currentStep === "details" && (
@@ -275,8 +275,8 @@ export default function Home() {
               </div>
             </div>
           )}
-        </div>
-        
+          </div>
+
         {currentStep !== "info" && currentStep !== "symptoms" && (
           <StepNavigation
             _currentStep={currentStep}
@@ -287,6 +287,6 @@ export default function Home() {
           />
         )}
       </div>
-    </div>
+        </div>
   );
 }
