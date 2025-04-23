@@ -1,6 +1,118 @@
 # SymptoTrack
 
-![SymptoTrack Logo](public/images/readme-banner.png)
+A medical symptom tracking and condition analysis application.
+
+## Features
+
+- Track symptoms and their severity
+- Get potential condition matches based on symptoms
+- View detailed treatment information
+- Save and share health reports
+- User authentication system
+- Profile management
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/YassineMouden/symptotrack.git
+   cd symptotrack
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file in the root directory with the following variables:
+   ```
+   # Next Auth
+   AUTH_SECRET="QC+KgH0JR8uRZNGy8XHEVf+KMrWg5/wSKrYu0f2JOZ0="
+
+   # Next Auth Discord Provider
+   AUTH_DISCORD_ID="your-discord-id"
+   AUTH_DISCORD_SECRET="your-discord-secret"
+
+   # Next Auth Google Provider
+   AUTH_GOOGLE_ID="your-google-id"
+   AUTH_GOOGLE_SECRET="your-google-secret"
+
+   # Next Auth GitHub Provider
+   AUTH_GITHUB_ID="your-github-id"
+   AUTH_GITHUB_SECRET="your-github-secret"
+
+   # Prisma
+   DATABASE_URL="postgresql://postgres:password@localhost:5432/symptotrack"
+
+   # OpenAI API
+   OPENAI_API_KEY="your-openai-api-key"
+
+   # Email Service
+   RESEND_API_KEY="your-resend-api-key"
+   ```
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Important Notes
+
+- The application currently uses mock data instead of a real database connection
+- For testing, use these credentials:
+  - Email: `test@example.com`
+  - Password: `password`
+- Authentication test pages:
+  - `/test-auth` - Simple authentication test page
+  - `/auth/test` - Detailed diagnostic page
+
+## Development Workflow
+
+For team collaboration, follow these steps:
+
+1. Create a new branch for each feature or bug fix:
+   ```bash
+   git checkout -b feature-name
+   ```
+
+2. Make changes and commit them:
+   ```bash
+   git add .
+   git commit -m "Descriptive message"
+   ```
+
+3. Push changes to GitHub:
+   ```bash
+   git push origin feature-name
+   ```
+
+4. Create a Pull Request on GitHub to merge changes into the main branch
+5. Review each other's code before merging
+
+## Technology Stack
+
+- Next.js 15
+- TypeScript
+- Tailwind CSS
+- NextAuth.js for authentication
+- OpenAI API for symptom analysis
+
+## Project Structure
+
+- `/src/app` - Main application code
+- `/src/app/_components` - Shared UI components
+- `/src/app/api` - API routes
+- `/src/server/auth` - Authentication configuration
+- `/src/utils` - Utility functions
 
 ## Overview
 
