@@ -5,32 +5,88 @@ import { env } from "~/env";
 // You'll need to add RESEND_API_KEY to your .env file
 const resend = new Resend(env.RESEND_API_KEY);
 
-interface SendEmailProps {
+/**
+ * Send a plain text email
+ */
+export async function sendEmail({
+  to,
+  subject,
+  text,
+  from = 'no-reply@symptotrack.com',
+}: {
   to: string;
   subject: string;
-  html: string;
+  text: string;
   from?: string;
-}
-
-export async function sendEmail({ to, subject, html, from = "SymptoTrack <noreply@symptotrack.com>" }: SendEmailProps) {
+}) {
   try {
     const { data, error } = await resend.emails.send({
       from,
       to,
       subject,
-      html,
+      text,
     });
 
     if (error) {
-      console.error('Email error:', error);
-      return { success: false, error: error.message };
+      console.error('Error sending email:', error);
+      return { success: false, error };
     }
 
-    return { success: true, messageId: data.id };
+    return { success: true, data };
   } catch (error) {
     console.error('Failed to send email:', error);
-    return { success: false, error: 'Failed to send email' };
+    return { success: false, error };
   }
+}
+
+/**
+ * Send a password reset email
+ */
+export async function sendPasswordResetEmail(email: string, resetLink: string) {
+  const subject = 'Reset your SymptoTrack password';
+  const text = `
+Hello,
+
+You requested to reset your password for SymptoTrack.
+
+Please click the link below to reset your password:
+${resetLink}
+
+This link will expire in 1 hour.
+
+If you didn't request this, please ignore this email.
+
+Best regards,
+The SymptoTrack Team
+  `.trim();
+
+  return sendEmail({ to: email, subject, text });
+}
+
+/**
+ * Send a welcome email
+ */
+export async function sendWelcomeEmail(email: string, name?: string) {
+  const subject = 'Welcome to SymptoTrack!';
+  const text = `
+Hello${name ? ` ${name}` : ''},
+
+Welcome to SymptoTrack! We're excited to have you on board.
+
+SymptoTrack helps you track your symptoms, understand your health, and get insights into potential conditions.
+
+Get started by:
+1. Setting up your profile
+2. Tracking your first symptoms
+3. Exploring the insights
+
+If you have any questions, please reply to this email.
+
+Best regards,
+The SymptoTrack Team
+  `.trim();
+
+  return sendEmail({ to: email, subject, text });
 }
 
 // Password reset email template

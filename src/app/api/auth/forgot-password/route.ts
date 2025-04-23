@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "~/server/db";
 import crypto from "crypto";
-import { sendEmail, getPasswordResetEmailHtml } from "~/lib/email";
+import { sendPasswordResetEmail } from "~/lib/email";
 
 // Define validation schema for password reset
 const resetSchema = z.object({
@@ -65,12 +65,8 @@ export async function POST(req: Request) {
     
     const resetLink = `${baseUrl}/auth/reset-password?token=${resetToken}`;
     
-    // Send the password reset email
-    await sendEmail({
-      to: user.email!,
-      subject: "Reset Your SymptoTrack Password",
-      html: getPasswordResetEmailHtml(user.name ?? "there", resetLink),
-    });
+    // Send the password reset email using the new function
+    await sendPasswordResetEmail(user.email!, resetLink);
     
     // Log for development purposes
     if (process.env.NODE_ENV !== "production") {

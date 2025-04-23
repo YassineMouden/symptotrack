@@ -1,22 +1,22 @@
 import { NextResponse } from "next/server";
-import { db } from "~/server/db";
 import { z } from "zod";
+import { db } from "~/server/db";
+import { sendEmail } from "~/lib/email";
 import bcrypt from "bcryptjs";
-import { sendEmail, getWelcomeEmailHtml } from "~/lib/email";
 
 // Define validation schema for password reset
-const resetPasswordSchema = z.object({
-  token: z.string().min(1, { message: "Token is required" }),
+const resetSchema = z.object({
+  token: z.string().min(10),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
 });
 
 export async function POST(request: Request) {
   try {
-    // Get request body and parse it as unknown first for type safety
-    const rawBody = await request.json() as unknown;
+    // Get request body
+    const body = await request.json();
     
     // Validate request body
-    const result = resetPasswordSchema.safeParse(rawBody);
+    const result = resetSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
         { message: result.error.errors[0]?.message ?? "Invalid input" },
@@ -26,16 +26,28 @@ export async function POST(request: Request) {
     
     const { token, password } = result.data;
     
-    // Find the token in the database
+    // Find reset token in database
     const resetToken = await db.passwordReset.findUnique({
       where: { token },
       include: { user: true },
     });
     
-    // Check if token exists and is not expired
-    if (!resetToken || resetToken.expires < new Date()) {
+    if (!resetToken) {
       return NextResponse.json(
         { message: "Invalid or expired token" },
+        { status: 400 }
+      );
+    }
+    
+    // Check if token is expired
+    if (resetToken.expires < new Date()) {
+      // Delete expired token
+      await db.passwordReset.delete({
+        where: { id: resetToken.id },
+      });
+      
+      return NextResponse.json(
+        { message: "Token has expired. Please request a new password reset link." },
         { status: 400 }
       );
     }
@@ -43,7 +55,7 @@ export async function POST(request: Request) {
     // Hash the new password
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Update the user's password
+    // Update user password
     await db.user.update({
       where: { id: resetToken.userId },
       data: { password: hashedPassword },
@@ -59,15 +71,16 @@ export async function POST(request: Request) {
       await sendEmail({
         to: resetToken.user.email,
         subject: "Your SymptoTrack Password Has Been Changed",
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #14b8a6;">Password Changed</h1>
-            <p>Hello ${resetToken.user.name ?? "there"},</p>
-            <p>Your password for SymptoTrack has been successfully changed.</p>
-            <p>If you did not request this change, please contact support immediately.</p>
-            <p>Best regards,<br>The SymptoTrack Team</p>
-          </div>
-        `,
+        text: `
+Hello ${resetToken.user.name ?? "there"},
+
+Your password for SymptoTrack has been successfully changed.
+
+If you did not request this change, please contact support immediately.
+
+Best regards,
+The SymptoTrack Team
+        `.trim(),
       });
     }
     
